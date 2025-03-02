@@ -9,26 +9,28 @@ import { useNavigate } from './useNavigate'
 import { useMatch } from './useMatch'
 import type {
   AnyContext,
-  AnySchema,
+  AnyRoute,
+  AnyRouter,
   Constrain,
   ConstrainLiteral,
-  RootRoute as CoreRootRoute,
   Route as CoreRoute,
   ErrorComponentProps,
   NotFoundRouteProps,
+  RegisteredRouter,
+  ResolveFullPath,
   ResolveId,
   ResolveParams,
   RootRouteId,
   RootRouteOptions,
-  RouteById,
-  RouteContext,
+  RouteConstraints,
   RouteIds,
   RouteLoaderFn,
+  RouteMask,
   RouteOptions,
   RoutePathOptionsIntersection,
-  RoutePaths,
-  RoutePrefix,
   RouteTypes,
+  RouteTypesById,
+  Router,
   ToMaskOptions,
   TrimPathRight,
   UpdatableRouteOptions,
@@ -40,7 +42,6 @@ import type { UseLoaderDepsRoute } from './useLoaderDeps'
 import type { UseParamsRoute } from './useParams'
 import type { UseSearchRoute } from './useSearch'
 import type * as Solid from 'solid-js'
-import type { AnyRouter, RegisteredRouter, Router } from './router'
 import type { NotFoundError } from './not-found'
 import type { LazyRoute } from './fileRoute'
 import type { UseRouteContextRoute } from './useRouteContext'
@@ -53,51 +54,6 @@ declare module '@tanstack/router-core' {
     pendingComponent?: RouteComponent
   }
 }
-
-export interface AnyRoute
-  extends Route<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  > {}
-
-export type AnyRouteWithContext<TContext> = AnyRoute & {
-  types: { allContext: TContext }
-}
-
-export type RouteConstraints = {
-  TParentRoute: AnyRoute
-  TPath: string
-  TFullPath: string
-  TCustomId: string
-  TId: string
-  TSearchSchema: AnySchema
-  TFullSearchSchema: AnySchema
-  TParams: Record<string, any>
-  TAllParams: Record<string, any>
-  TParentContext: AnyContext
-  TRouteContext: RouteContext
-  TAllContext: AnyContext
-  TRouterContext: AnyContext
-  TChildren: unknown
-  TRouteTree: AnyRoute
-}
-
-export type RouteTypesById<TRouter extends AnyRouter, TId> = RouteById<
-  TRouter['routeTree'],
-  TId
->['types']
 
 export function getRouteApi<
   const TId,
@@ -203,7 +159,7 @@ export class Route<
       TFileRouteTypes
     >
 {
-  isRoot: TParentRoute extends Route<any> ? true : false
+  isRoot: TParentRoute extends AnyRoute ? true : false
   options: RouteOptions<
     TParentRoute,
     TId,
@@ -657,43 +613,30 @@ export function createRootRouteWithContext<TRouterContext extends {}>() {
 export const rootRouteWithContext = createRootRouteWithContext
 
 export class RootRoute<
-    in out TSearchValidator = undefined,
-    in out TRouterContext = {},
-    in out TRouteContextFn = AnyContext,
-    in out TBeforeLoadFn = AnyContext,
-    in out TLoaderDeps extends Record<string, any> = {},
-    in out TLoaderFn = undefined,
-    in out TChildren = unknown,
-    in out TFileRouteTypes = unknown,
-  >
-  extends Route<
-    any, // TParentRoute
-    '/', // TPath
-    '/', // TFullPath
-    string, // TCustomId
-    RootRouteId, // TId
-    TSearchValidator, // TSearchValidator
-    {}, // TParams
-    TRouterContext,
-    TRouteContextFn,
-    TBeforeLoadFn,
-    TLoaderDeps,
-    TLoaderFn,
-    TChildren, // TChildren
-    TFileRouteTypes
-  >
-  implements
-    CoreRootRoute<
-      TSearchValidator,
-      TRouterContext,
-      TRouteContextFn,
-      TBeforeLoadFn,
-      TLoaderDeps,
-      TLoaderFn,
-      TChildren,
-      TFileRouteTypes
-    >
-{
+  in out TSearchValidator = undefined,
+  in out TRouterContext = {},
+  in out TRouteContextFn = AnyContext,
+  in out TBeforeLoadFn = AnyContext,
+  in out TLoaderDeps extends Record<string, any> = {},
+  in out TLoaderFn = undefined,
+  in out TChildren = unknown,
+  in out TFileRouteTypes = unknown,
+> extends Route<
+  any, // TParentRoute
+  '/', // TPath
+  '/', // TFullPath
+  string, // TCustomId
+  RootRouteId, // TId
+  TSearchValidator, // TSearchValidator
+  {}, // TParams
+  TRouterContext,
+  TRouteContextFn,
+  TBeforeLoadFn,
+  TLoaderDeps,
+  TLoaderFn,
+  TChildren, // TChildren
+  TFileRouteTypes
+> {
   /**
    * @deprecated `RootRoute` is now an internal implementation detail. Use `createRootRoute()` instead.
    */
@@ -804,23 +747,6 @@ export function createRootRoute<
   >(options)
 }
 
-export type ResolveFullPath<
-  TParentRoute extends AnyRoute,
-  TPath extends string,
-  TPrefixed = RoutePrefix<TParentRoute['fullPath'], TPath>,
-> = TPrefixed extends RootRouteId ? '/' : TPrefixed
-
-export type RouteMask<TRouteTree extends AnyRoute> = {
-  routeTree: TRouteTree
-  from: RoutePaths<TRouteTree>
-  to?: any
-  params?: any
-  search?: any
-  hash?: any
-  state?: any
-  unmaskOnReload?: boolean
-}
-
 export function createRouteMask<
   TRouteTree extends AnyRoute,
   TFrom extends string,
@@ -828,7 +754,7 @@ export function createRouteMask<
 >(
   opts: {
     routeTree: TRouteTree
-  } & ToMaskOptions<Router<TRouteTree, 'never'>, TFrom, TTo>,
+  } & ToMaskOptions<Router<TRouteTree, 'never', false>, TFrom, TTo>,
 ): RouteMask<TRouteTree> {
   return opts as any
 }

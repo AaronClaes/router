@@ -60,6 +60,8 @@ export type {
   InferFileRouteTypes,
   FileRouteTypes,
   FileRoutesByPath,
+  LazyRoute,
+  LazyRouteOptions,
 } from './fileRoute'
 
 export type {
@@ -91,6 +93,7 @@ export type {
   MakeRouteMatch,
   AnyRouteMatch,
   MakeRouteMatchFromRoute,
+  MatchRouteOptions,
 } from './Matches'
 export {
   joinPaths,
@@ -166,7 +169,6 @@ export type {
   ResolveAllParamsFromParent,
   AnyRoute,
   Route,
-  RootRoute,
   RouteTypes,
   FullSearchSchemaOption,
   RemountDepsOptions,
@@ -186,6 +188,9 @@ export type {
   ContextOptions,
   RootRouteOptions,
   UpdatableRouteOptionsExtensions,
+  RouteConstraints,
+  RouteTypesById,
+  RouteMask,
 } from './route'
 
 export { defaultSerializeError, getLocationChangeInfo } from './router'
@@ -201,6 +206,39 @@ export type {
   AnyRouter,
   AnyRouterWithContext,
   RegisteredRouter,
+  RouterState,
+  BuildNextOptions,
+  RouterListener,
+  RouterEvent,
+  ListenerFn,
+  RouterEvents,
+  MatchRoutesOpts,
+  RouterOptionsExtensions,
+  Router,
+  DefaultRemountDepsFn,
+  PreloadRouteFn,
+  MatchRouteFn,
+  RouterContextOptions,
+  RouterOptions,
+  RouterConstructorOptions,
+  UpdateFn,
+  ParseLocationFn,
+  InvalidateFn,
+  ControllablePromise,
+  InjectedHtmlEntry,
+  RouterErrorSerializer,
+  MatchedRoutesResult,
+  EmitFn,
+  LoadFn,
+  GetMatchFn,
+  SubscribeFn,
+  UpdateMatchFn,
+  CommitLocationFn,
+  GetMatchRoutesFn,
+  MatchRoutesFn,
+  StartTransitionFn,
+  LoadRouteChunkFn,
+  ServerSrr,
 } from './router'
 
 export type {
